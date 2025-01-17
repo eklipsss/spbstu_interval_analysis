@@ -142,13 +142,14 @@ class rawData:
                 for channel in range(0, 8):
                     plt.subplot(2, 4, channel + 1)
                     plt.plot(np.array(bin_file.frames[frame])[:, channel],
-                             color="royalblue")
+                             color="salmon")
                     plt.title(f"{lvl, frame, channel + 1}")
                 plt.show()
             else:
-                colors = ["cyan", "deepskyblue", "teal", "darkslateblue",
-                          "midnightblue", "indigo", "slategray", "turquoise"]
+                # colors = ["cyan", "deepskyblue", "teal", "darkslateblue",
+                #           "midnightblue", "indigo", "slategray", "turquoise"]
                 # colors = ["#EF476F", "#F78C6B", "#FFD166", "#83D483", "#06D6A0", "#0CB0A9", "#118AB2", "#073B4C"]
+                colors = ["#EF476F", "#F78C6B", "#FFD166", "#83D483", "#06D6A0", "#0CB0A9", "#118AB2", "#073B4C"]
                 for channel in range(0, 8):
                     plt.plot(np.array(self.get_bin_by_lvl(lvl).frames[frame])[:, channel],
                              color=colors[channel], label=f"channel {channel + 1}", alpha=0.8)
@@ -161,3 +162,6 @@ class rawData:
 
 rawData_instance = rawData(PATH)
 rawData_instance.read_directory()
+rawData_instance.plot_bin_by_lvl_frame_all_bins(-0.492, 1)
+rawData_instance.plot_bin_by_lvl_frame_all_bins(-0.492, 1, False)
+# rawData_instance.hist_bin_by_lvl_frame_all_bins(-0.492, 1, False)

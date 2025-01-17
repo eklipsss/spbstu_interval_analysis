@@ -1,9 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import linprog
+# from data_corr import plot_tol_sys
+
 
 
 def ir_plotmodelset(irproblems, xlimits=None):
+    # colors = ["#EF476F", "#F78C6B", "#FFD166", "#83D483", "#06D6A0", "#0CB0A9", "#118AB2", "#073B4C"]
     colors = ["#e06666", "#f6b26b", "#ffd966", "#93c47d", "#76a5af", "#8e7cc3", "#FF60A8", "#CFF800"]
     colors.reverse()
     if len(irproblems) > len(colors):
@@ -50,7 +53,7 @@ def ir_plotmodelset(irproblems, xlimits=None):
     plt.xlabel('X')
     plt.ylabel('Y')
     plt.title('IR Model Set Plot')
-    plt.show()
+    # plt.show()
 
 
 def ir_predict(irproblem, Xp):
@@ -115,3 +118,4 @@ def ir_predict(irproblem, Xp):
     betap = np.stack((betaplow, betaphigh), axis=-1)
 
     return yp, betap, 0, active
+

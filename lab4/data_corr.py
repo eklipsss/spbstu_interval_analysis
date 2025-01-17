@@ -6,11 +6,45 @@ from tolsolvty import tolsolvty
 from ir_problem import ir_problem, ir_outer
 from ir_plotmodelset import ir_plotmodelset
 import matplotlib.pyplot as plt
+from read_dir import rawData_instance
 
 ip.precision.extendedPrecisionQ = False
 
 
-def plot_tol_sys(Xi, Ysint, Ysout, fname, title="Допусковое множество", ):
+def print_intervals(ys_int, ys_ext, Xs_lvls):
+    ys_int_to_plot = [np.average(i) for i in ys_int]
+    ys_ext_to_plot = [np.average(i) for i in ys_ext]
+
+
+    def gen_yi1(ys_int_to_plot):
+        return np.abs(ys_int[:, 0] - ys_int_to_plot)
+
+    def gen_yi2(ys_int_to_plot):
+        return np.abs(ys_int[:, 1] - ys_int_to_plot)
+
+    def gen_ye1(ys_ext_to_plot):
+        return np.abs(ys_ext[:, 0] - ys_ext_to_plot)
+
+    def gen_ye2(ys_ext_to_plot):
+        return np.abs(ys_ext[:, 1] - ys_ext_to_plot)
+
+    yerr_int = [
+        gen_yi1(ys_int_to_plot),
+        gen_yi2(ys_int_to_plot)
+    ]
+    yerr_ext = [
+        gen_ye1(ys_ext_to_plot),
+        gen_ye2(ys_ext_to_plot)
+    ]
+
+    plt.errorbar(Xs_lvls, ys_int_to_plot, yerr=yerr_int, marker=".", linestyle='none',
+                 ecolor='k', elinewidth=0.8, capsize=4, capthick=1)
+    plt.errorbar(Xs_lvls, ys_ext_to_plot, yerr=yerr_ext, linestyle='none',
+                 ecolor='r', elinewidth=0.8, capsize=4, capthick=1)
+    # plt.show()
+
+
+def plot_tol_sys(Xi, Ysint, Ysout, fname, title="Допусковое множество"):
     vert1 = ip.IntLinIncR2(Xi, Ysint, consistency='tol', show=False)
 
     vert = ip.IntLinIncR2(Xi, Ysout, consistency='tol', show=False)
@@ -29,7 +63,7 @@ def plot_tol_sys(Xi, Ysint, Ysout, fname, title="Допусковое множе
             vert_x.append(x_0)
             vert_y.append(y_0)
 
-            plt.scatter(vert_x, vert_y, color="#ff96c5", marker=".")
+            plt.scatter(vert_x, vert_y, color="#FF96C5", marker=".")
             plt.fill(vert_x, vert_y, linestyle='-', linewidth=1, color="#ff96c5", alpha=0.7)
 
     for ortant in range(len(vert1)):
@@ -44,6 +78,7 @@ def plot_tol_sys(Xi, Ysint, Ysout, fname, title="Допусковое множе
             y_0 = vert1_y[0]
             vert1_x.append(x_0)
             vert1_y.append(y_0)
+
             plt.scatter(vert1_x, vert1_y, color="#FFEC59", marker=".")
             plt.fill(vert1_x, vert1_y, linestyle='-', linewidth=1, color="#FFEC59", alpha=0.7)
 
@@ -55,9 +90,9 @@ def plot_tol_sys(Xi, Ysint, Ysout, fname, title="Допусковое множе
     plt.show()
 
 
-def data_corr_naive(Ysint, Ysout, Xi, graphics=False, ):
-    y = mid(Ysint)*(1/16384) - 0.5
-    epsilon = rad(Ysint)*(1/16384)
+def data_corr_naive(Ysint, Ysout, Xi,  ys_int, ys_ext, Xs_lvls, graphics=False):
+    y = ip.mid(Ysint)*(1/16384) - 0.5
+    epsilon = ip.rad(Ysint)*(1/16384)
 
     if graphics:
         plot_tol_sys(Xi, Ysint * (1 / 16384) - 0.5, Ysout * (1 / 16384) - 0.5, "tol-before-alg")
@@ -66,7 +101,9 @@ def data_corr_naive(Ysint, Ysout, Xi, graphics=False, ):
 
     tolmax, argmax, env, ccode = tolsolvty(ip.inf(Xi), ip.sup(Xi),
                                            ip.inf(y - epsilon).reshape(-1, 1), ip.sup(y + epsilon).reshape(-1, 1))
-
+    print("\ntolmax: ", tolmax)
+    print("\nargmax: ", argmax)
+    print("\nenv: ", env)
 
     if tolmax > 0:
         print("\n!______tolmax > 0______!")
@@ -78,7 +115,12 @@ def data_corr_naive(Ysint, Ysout, Xi, graphics=False, ):
         irp_DRSint = ir_problem(ip.inf(Xi), y, epsilon)
 
         if graphics:
-            ir_plotmodelset([irp_DRSout, irp_DRSint])
+            # ir_plotmodelset([irp_DRSout, irp_DRSint])
+            print("I: ", ys_int)
+            print("II: ", ys_ext)
+            print("III: ", Xs_lvls)
+            print_intervals(ys_int, ys_ext, Xs_lvls)
+            plt.show()
 
         b_int = ir_outer(irp_DRSint)
         return b_int, []  # indtoout = None
@@ -106,10 +148,16 @@ def data_corr_naive(Ysint, Ysout, Xi, graphics=False, ):
 
     irp_DRSint = ir_problem(ip.inf(Xi), y, epsilon)
 
+
     if graphics:
         ir_plotmodelset([irp_DRSout, irp_DRSint])
+        print("I: ", ys_int)
+        print("II: ", ys_ext)
+        print_intervals(ys_int, ys_ext, Xs_lvls)
+        plt.show()
 
     b_int = ir_outer(irp_DRSint)
 
     return b_int, indtoout
+
 

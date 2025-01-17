@@ -44,6 +44,7 @@ def remove_outliers(data_list, print_flag):
 
 
 def get_ynow(ch, cells, fn, print_flag=False):
+    print_flag = True
     CH18 = fn.frames  # 100 штук по 8
     Ch = []
     for i in range(fn.frame_count):
@@ -61,10 +62,11 @@ def get_ynow(ch, cells, fn, print_flag=False):
 
     if print_flag:
         plt.subplot(1, 2, 1)
-        plt.hist(ynow_V, edgecolor="cornflowerblue", bins=30)
+        plt.hist(ynow_V, color = '#6C5B7D', edgecolor="#383C57", bins=30)
+        plt.title(f"До отсеивания выбросов: lvl = {fn.lvl}")
         plt.subplot(1, 2, 2)
-        plt.hist(ynow_cut_V, edgecolor="cornflowerblue", bins=30)
-        plt.title(f"{fn.lvl}")
+        plt.hist(ynow_cut_V,  color = '#6C5B7D', edgecolor="#383C57", bins=30)
+        plt.title(f"После отсеивания выбросов: lvl = {fn.lvl}")
         plt.show()
 
     return ynow_cut, width
